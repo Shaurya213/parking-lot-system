@@ -26,6 +26,17 @@ type ParkingLot struct {
 	Slots []Slot
 }
 
+func (pl *ParkingLot) UnparkCar(carNumber string) (int, error) {
+	for i := range pl.Slots {
+		if !pl.Slots[i].IsEmpty && pl.Slots[i].Car.Number == carNumber {
+			pl.Slots[i].Car = nil
+			pl.Slots[i].IsEmpty = true
+			return pl.Slots[i].Number, nil
+		}
+	}
+	return -1, fmt.Errorf("car not found")
+}
+
 func NewParkingLot(name string, capacity int) *ParkingLot {
 	slots := make([]Slot, capacity)
 	for i := range slots {

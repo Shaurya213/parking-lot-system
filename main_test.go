@@ -31,3 +31,25 @@ func TestParkCar_FullLot(t *testing.T) {
 		t.Errorf("expected error when parking in full lot, got nil")
 	}
 }
+
+func TestUnparkCar_Success(t *testing.T) {
+	lot := NewParkingLot("Lot A", 2)
+	car := &Car{Number: "KA01AB9999"}
+	_, _ = lot.ParkCar(car)
+
+	slot, err := lot.UnparkCar("KA01AB9999")
+	if err != nil {
+		t.Fatalf("expected successful unpark, got error: %v", err)
+	}
+	if slot != 1 {
+		t.Errorf("expected to unpark from slot 1, got %d", slot)
+	}
+}
+
+func TestUnparkCar_NotFound(t *testing.T) {
+	lot := NewParkingLot("Lot A", 1)
+	_, err := lot.UnparkCar("NOTEXIST123")
+	if err == nil {
+		t.Error("expected error for car not found, got nil")
+	}
+}
