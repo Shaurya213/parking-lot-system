@@ -1,0 +1,33 @@
+// main_test.go
+package main
+
+import (
+	"testing"
+)
+
+func TestParkCar_Success(t *testing.T) {
+	lot := NewParkingLot("Lot A", 2)
+	car := &Car{Number: "KA01AB1234", Color: "Red", Make: "Honda", Size: "small", IsHandicap: false}
+
+	slot, err := lot.ParkCar(car)
+	if err != nil {
+		t.Fatalf("expected to park car successfully, got error: %v", err)
+	}
+
+	if slot != 1 {
+		t.Errorf("expected car to be parked at slot 1, got slot %d", slot)
+	}
+}
+
+func TestParkCar_FullLot(t *testing.T) {
+	lot := NewParkingLot("Lot A", 1)
+	car1 := &Car{Number: "KA01AB1234"}
+	car2 := &Car{Number: "KA01AB5678"}
+
+	_, _ = lot.ParkCar(car1)
+	_, err := lot.ParkCar(car2)
+
+	if err == nil {
+		t.Errorf("expected error when parking in full lot, got nil")
+	}
+}
