@@ -22,8 +22,9 @@ type Slot struct {
 }
 
 type ParkingLot struct {
-	Name  string
-	Slots []Slot
+	Name      string
+	Slots     []Slot
+	Observers []Observer
 }
 
 func (pl *ParkingLot) UnparkCar(carNumber string) (int, error) {
@@ -64,4 +65,20 @@ func (pl *ParkingLot) IsFull() bool {
 		}
 	}
 	return true
+}
+
+type Observer func(msg string)
+
+func (pl *ParkingLot) NotifyObservers(message string) {
+	for _, observer := range pl.Observers {
+		observer(message)
+	}
+}
+
+func (pl *ParkingLot) ParkCarWithNotification(car *Car) (int, error) {
+	slot, err := pl.ParkCar(car)
+	if err != nil {
+		pl.NotifyObservers("FULL")
+	}
+	return slot, err
 }
