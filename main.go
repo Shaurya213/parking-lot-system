@@ -56,3 +56,12 @@ func (pl *ParkingLot) ParkCar(car *Car) (int, error) {
 	}
 	return -1, fmt.Errorf("parking lot is full")
 }
+
+func (pl *ParkingLot) IsFull() bool {
+	for _, slot := range pl.Slots {
+		if slot.IsEmpty {
+			return false
+		}
+	}
+	return true
+}
