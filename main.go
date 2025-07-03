@@ -104,3 +104,12 @@ func (a *Attendant) ParkCarForDriver(car *Car) (int, error) {
 	fmt.Printf("Attendant %s is parking car %s\n", a.Name, car.Number)
 	return a.Lot.ParkCar(car)
 }
+
+func (pl *ParkingLot) FindCar(carNumber string) (*Slot, error) {
+	for i := range pl.Slots {
+		if !pl.Slots[i].IsEmpty && pl.Slots[i].Car.Number == carNumber {
+			return &pl.Slots[i], nil
+		}
+	}
+	return nil, fmt.Errorf("car %s not found in lot", carNumber)
+}
