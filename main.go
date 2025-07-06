@@ -16,9 +16,10 @@ type Car struct {
 }
 
 type Slot struct {
-	Number  int
-	IsEmpty bool
-	Car     *Car
+	Number        int
+	IsEmpty       bool
+	Car           *Car
+	AttendantName string // Added field
 }
 
 type ParkingLot struct {
@@ -101,8 +102,16 @@ type Attendant struct {
 }
 
 func (a *Attendant) ParkCarForDriver(car *Car) (int, error) {
-	fmt.Printf("Attendant %s is parking car %s\n", a.Name, car.Number)
-	return a.Lot.ParkCar(car)
+	for i := range a.Lot.Slots {
+		if a.Lot.Slots[i].IsEmpty {
+			a.Lot.Slots[i].Car = car
+			a.Lot.Slots[i].IsEmpty = false
+			a.Lot.Slots[i].AttendantName = a.Name // record attendant
+			car.ParkedAt = time.Now()
+			return a.Lot.Slots[i].Number, nil
+		}
+	}
+	return -1, fmt.Errorf("lot is full")
 }
 
 func (pl *ParkingLot) FindCar(carNumber string) (*Slot, error) {
