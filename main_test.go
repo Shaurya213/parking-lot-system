@@ -241,25 +241,56 @@ func TestFindWhiteCars(t *testing.T) {
 	}
 }
 
-func TestFindBlueToyotaCarsWithAttendants(t *testing.T) {
+func TestGenericCarFinder_BlueToyota(t *testing.T) {
 	lot := NewParkingLot("Lot A", 3)
 	attendant := &Attendant{Name: "Alice", Lot: lot}
 
-	car1 := &Car{Number: "BLUET1", Color: "Blue", Make: "Toyota"}
-	car2 := &Car{Number: "BLUENOT", Color: "Blue", Make: "Honda"}
-	car3 := &Car{Number: "REDT2", Color: "Red", Make: "Toyota"}
+	car1 := &Car{Number: "X1", Color: "Blue", Make: "Toyota"}
+	car2 := &Car{Number: "X2", Color: "Blue", Make: "Honda"}
+	car3 := &Car{Number: "X3", Color: "Red", Make: "Toyota"}
 
 	_, _ = attendant.ParkCarForDriver(car1)
 	_, _ = attendant.ParkCarForDriver(car2)
 	_, _ = attendant.ParkCarForDriver(car3)
 
 	manager := &ParkingManager{Lots: []*ParkingLot{lot}}
-	found := manager.FindBlueToyotaWithAttendants()
+
+	filter := CarFilter{
+		Color: "Blue",
+		Make:  "Toyota",
+	}
+
+	found := manager.FindCars(filter)
 
 	if len(found) != 1 {
 		t.Fatalf("expected 1 Blue Toyota, got %d", len(found))
 	}
-	if found[0].Car.Number != "BLUET1" || found[0].Attendant != "Alice" {
-		t.Error("wrong car or attendant info returned")
+	if found[0].Car.Number != "X1" || found[0].Attendant != "Alice" {
+		t.Errorf("unexpected result: %+v", found[0])
+	}
+}
+
+func TestFindAllParkedBMWs(t *testing.T) {
+	lot := NewParkingLot("Lot A", 3)
+	attendant := &Attendant{Name: "Bob", Lot: lot}
+
+	car1 := &Car{Number: "BMW1", Make: "BMW", Color: "Black"}
+	car2 := &Car{Number: "BMW2", Make: "BMW", Color: "White"}
+	car3 := &Car{Number: "AUDI1", Make: "Audi", Color: "Blue"}
+
+	_, _ = attendant.ParkCarForDriver(car1)
+	_, _ = attendant.ParkCarForDriver(car2)
+	_, _ = attendant.ParkCarForDriver(car3)
+
+	manager := &ParkingManager{Lots: []*ParkingLot{lot}}
+
+	filter := CarFilter{Make: "BMW"}
+	results := manager.FindCars(filter)
+
+	if len(results) != 2 {
+		t.Errorf("expected 2 BMWs, got %d", len(results))
+	}
+	if results[0].Car.Make != "BMW" || results[1].Car.Make != "BMW" {
+		t.Errorf("unexpected car make in result: %v", results)
 	}
 }

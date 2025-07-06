@@ -15,6 +15,13 @@ type Car struct {
 	ParkedAt   time.Time
 }
 
+type CarFilter struct {
+	Color      string
+	Make       string
+	Size       string
+	IsHandicap *bool // use pointer to distinguish unset vs false
+}
+
 type Slot struct {
 	Number        int
 	IsEmpty       bool
@@ -255,5 +262,36 @@ func (pm *ParkingManager) FindBlueToyotaWithAttendants() []CarWithAttendant {
 			}
 		}
 	}
+	return result
+}
+
+func (pm *ParkingManager) FindCars(filter CarFilter) []CarWithAttendant {
+	var result []CarWithAttendant
+
+	for _, lot := range pm.Lots {
+		for _, slot := range lot.Slots {
+			if slot.IsEmpty {
+				continue
+			}
+			car := slot.Car
+			if filter.Color != "" && car.Color != filter.Color {
+				continue
+			}
+			if filter.Make != "" && car.Make != filter.Make {
+				continue
+			}
+			if filter.Size != "" && car.Size != filter.Size {
+				continue
+			}
+			if filter.IsHandicap != nil && car.IsHandicap != *filter.IsHandicap {
+				continue
+			}
+			result = append(result, CarWithAttendant{
+				Car:       *car,
+				Attendant: slot.AttendantName,
+			})
+		}
+	}
+
 	return result
 }
