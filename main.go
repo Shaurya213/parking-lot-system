@@ -102,13 +102,18 @@ type Attendant struct {
 }
 
 func (a *Attendant) ParkCarForDriver(car *Car) (int, error) {
-	for i := range a.Lot.Slots {
-		if a.Lot.Slots[i].IsEmpty {
-			a.Lot.Slots[i].Car = car
-			a.Lot.Slots[i].IsEmpty = false
-			a.Lot.Slots[i].AttendantName = a.Name // record attendant
+	fmt.Printf("Attendant %s is parking car %s\n", a.Name, car.Number)
+	return a.Lot.ParkCarWithAttendant(car, a.Name)
+}
+
+func (pl *ParkingLot) ParkCarWithAttendant(car *Car, attendantName string) (int, error) {
+	for i := range pl.Slots {
+		if pl.Slots[i].IsEmpty {
+			pl.Slots[i].Car = car
+			pl.Slots[i].IsEmpty = false
+			pl.Slots[i].AttendantName = attendantName
 			car.ParkedAt = time.Now()
-			return a.Lot.Slots[i].Number, nil
+			return pl.Slots[i].Number, nil
 		}
 	}
 	return -1, fmt.Errorf("lot is full")
