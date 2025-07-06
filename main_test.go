@@ -240,3 +240,26 @@ func TestFindWhiteCars(t *testing.T) {
 		t.Errorf("expected 2 white cars, got %d", len(whiteCars))
 	}
 }
+
+func TestFindBlueToyotaCarsWithAttendants(t *testing.T) {
+	lot := NewParkingLot("Lot A", 3)
+	attendant := &Attendant{Name: "Alice", Lot: lot}
+
+	car1 := &Car{Number: "BLUET1", Color: "Blue", Make: "Toyota"}
+	car2 := &Car{Number: "BLUENOT", Color: "Blue", Make: "Honda"}
+	car3 := &Car{Number: "REDT2", Color: "Red", Make: "Toyota"}
+
+	_, _ = attendant.ParkCarForDriver(car1)
+	_, _ = attendant.ParkCarForDriver(car2)
+	_, _ = attendant.ParkCarForDriver(car3)
+
+	manager := &ParkingManager{Lots: []*ParkingLot{lot}}
+	found := manager.FindBlueToyotaWithAttendants()
+
+	if len(found) != 1 {
+		t.Fatalf("expected 1 Blue Toyota, got %d", len(found))
+	}
+	if found[0].Car.Number != "BLUET1" || found[0].Attendant != "Alice" {
+		t.Error("wrong car or attendant info returned")
+	}
+}

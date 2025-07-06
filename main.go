@@ -232,3 +232,23 @@ func (pm *ParkingManager) FindCarsByColor(color string) []Car {
 	}
 	return result
 }
+
+type CarWithAttendant struct {
+	Car
+	Attendant string
+}
+
+func (pm *ParkingManager) FindBlueToyotaWithAttendants() []CarWithAttendant {
+	var result []CarWithAttendant
+	for _, lot := range pm.Lots {
+		for _, slot := range lot.Slots {
+			if !slot.IsEmpty && slot.Car.Color == "Blue" && slot.Car.Make == "Toyota" {
+				result = append(result, CarWithAttendant{
+					Car:       *slot.Car,
+					Attendant: slot.AttendantName,
+				})
+			}
+		}
+	}
+	return result
+}
