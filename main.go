@@ -24,9 +24,10 @@ type CarFilter struct {
 
 type Slot struct {
 	Number        int
+	Row           string // A, B, C, D etc.
 	IsEmpty       bool
 	Car           *Car
-	AttendantName string // Added field
+	AttendantName string
 }
 
 type ParkingLot struct {
@@ -48,8 +49,15 @@ func (pl *ParkingLot) UnparkCar(carNumber string) (int, error) {
 
 func NewParkingLot(name string, capacity int) *ParkingLot {
 	slots := make([]Slot, capacity)
+	rowLetters := []string{"A", "B", "C", "D", "E"}
+
 	for i := range slots {
-		slots[i] = Slot{Number: i + 1, IsEmpty: true}
+		row := rowLetters[i%len(rowLetters)]
+		slots[i] = Slot{
+			Number:  i + 1,
+			Row:     row,
+			IsEmpty: true,
+		}
 	}
 	return &ParkingLot{Name: name, Slots: slots}
 }
@@ -246,8 +254,9 @@ func (pm *ParkingManager) FindCarsByColor(color string) []Car {
 }
 
 type CarWithAttendant struct {
-	Car
+	Car       Car
 	Attendant string
+	Row       string // ✅ Add Row here
 }
 
 func (pm *ParkingManager) FindBlueToyotaWithAttendants() []CarWithAttendant {
@@ -307,6 +316,24 @@ func (pm *ParkingManager) FindCarsParkedWithin(duration time.Duration) []CarWith
 					Car:       *slot.Car,
 					Attendant: slot.AttendantName,
 				})
+			}
+		}
+	}
+	return result
+}
+
+func (pm *ParkingManager) FindSmallHandicapInRowBOrD() []CarWithAttendant {
+	var result []CarWithAttendant
+	for _, lot := range pm.Lots {
+		for _, slot := range lot.Slots {
+			if !slot.IsEmpty && slot.Car.Size == "small" && slot.Car.IsHandicap &&
+				(slot.Row == "B" || slot.Row == "D") {
+				result = append(result, CarWithAttendant{
+					Car:       *slot.Car,
+					Attendant: slot.AttendantName,
+					Row:       slot.Row, // ✅ Set row from slot
+				})
+
 			}
 		}
 	}
